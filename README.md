@@ -1,0 +1,32 @@
+# Kraz Predictor — Version Manifest
+
+This repo serves a single text file that gates which client builds are allowed to run.
+
+## How it works
+
+The Kraz Predictor `.exe` fetches `min_version.txt` over HTTPS on every launch. If the running build's `APP_VERSION` is strictly older than the value in this file, the client refuses to start and shows the OUTDATED screen.
+
+## Usage
+
+- **Releasing a new build, no lockout**: just ship the new `.exe`. Old builds keep working.
+- **Killing every older client**: bump the value in `min_version.txt` to match the new build's `APP_VERSION`, then commit.
+
+## Format
+
+A single line with a semver-ish version. Both forms accepted:
+
+```
+2.5.0
+```
+
+or
+
+```
+v2.5.0
+```
+
+## Notes
+
+- GitHub's raw endpoint caches for ~5 minutes — invalidations propagate within that window.
+- Network failures on the client fail **open** (offline users aren't locked out of an otherwise-current build).
+- Don't set this above the latest shipping `APP_VERSION` or you'll lock yourself out of your own release.
